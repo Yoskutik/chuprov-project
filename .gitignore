@@ -1,0 +1,8 @@
+node_modules
+__pycache__
+logs.log
+tmp.py
+services.csv
+users.csv
+*.dump.db
+.idea
