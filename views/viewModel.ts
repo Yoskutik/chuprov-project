@@ -24,10 +24,10 @@ export default class ViewModel {
 
         const services = fetch('http://127.0.0.1:69/api/v1/get_services', {method: 'post'}).then(res => res.json());
         services.then(res => {
-            this.fireServices = res.filter(it => it.type === 'Пожарные').map(it => ({...it, value: 30}));
-            this.policeServices = res.filter(it => it.type === 'Полиция').map(it => ({...it, value: 30}));
-            this.medicalServices = res.filter(it => it.type === 'Скорая').map(it => ({...it, value: 30}));
-            this.gasServices = res.filter(it => it.type === 'Газовая').map(it => ({...it, value: 30}));
+            this.fireServices = res.filter(it => it.type === 0).map(it => ({...it, value: 30}));
+            this.policeServices = res.filter(it => it.type ===  1).map(it => ({...it, value: 30}));
+            this.medicalServices = res.filter(it => it.type === 2).map(it => ({...it, value: 30}));
+            this.gasServices = res.filter(it => it.type === 3).map(it => ({...it, value: 30}));
         });
 
         Promise.all([users, services]).then(() => {
@@ -42,7 +42,7 @@ export default class ViewModel {
         x: Math.random() * 100,
         y: Math.random() * 100,
         token: this.tokens[randInt(0, this.tokens.length)],
-        service: ['Пожарные', 'Полиция', 'Скорая', 'Газовая'][Math.floor(randInt(0, 4))],
+        service: Math.floor(randInt(0, 3)),
     });
 
     private startAdding = () => {
@@ -80,7 +80,7 @@ export default class ViewModel {
             setTimeout(() => {
                 fetch(`http://127.0.0.1:69/api/v1/quit/${Math.floor(Math.random() * 50)}`, {
                     method: 'post',
-                })
+                });
                 del();
             }, 60 * 1000 / this.removePerMinute || 1000);
         };

@@ -17,7 +17,7 @@ app = FastAPI()
 class FindRequest(BaseModel):
     ip: str
     token: str
-    service: str
+    service: int
     x: float
     y: float
 
@@ -76,8 +76,7 @@ async def user_quit(id: int):
 
 
 @app.post('/api/v1/get_occupancy')
-async def get_occupancy(request: Request):
-    print(request.user.host)
+async def get_occupancy():
     return (services.occupied / services.capacity).mean()
 
 
