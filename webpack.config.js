@@ -37,6 +37,9 @@ module.exports = (env = {}, argv = {}) => {
         devServer: {
             open: true,
             port: 80,
+            proxy: {
+                '/api': 'http://127.0.0.1:69',
+            },
         },
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],

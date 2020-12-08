@@ -8,7 +8,7 @@ export default class ViewModel {
     @observable distances: number[] = [];
     @observable occupancies: number[] = [];
     @observable mapPoints: any[] = [];
-    @observable addPerMinute: number = 60;
+    @observable addPerMinute: number = 30;
     @observable removePerMinute: number = 30;
 
     @observable fireServices: any[] = [];
@@ -17,12 +17,12 @@ export default class ViewModel {
     @observable gasServices: any[] = [];
 
     constructor() {
-        const users = fetch('http://127.0.0.1:69/api/v1/get_users', {method: 'post'}).then(res => res.json());
+        const users = fetch('/api/v1/get_users', {method: 'post'}).then(res => res.json());
         users.then(res => {
             this.tokens = res;
         });
 
-        const services = fetch('http://127.0.0.1:69/api/v1/get_services', {method: 'post'}).then(res => res.json());
+        const services = fetch('/api/v1/get_services', {method: 'post'}).then(res => res.json());
         services.then(res => {
             this.fireServices = res.filter(it => it.type === 0).map(it => ({...it, value: 30}));
             this.policeServices = res.filter(it => it.type ===  1).map(it => ({...it, value: 30}));
@@ -49,7 +49,7 @@ export default class ViewModel {
         const add = () => {
             setTimeout(() => {
                 const data = this.generateUserData();
-                fetch('http://127.0.0.1:69/api/v1/find', {
+                fetch('/api/v1/find', {
                     method: 'post',
                     body: JSON.stringify(data),
                 })
@@ -78,7 +78,7 @@ export default class ViewModel {
     private startRemoving = () => {
         const del = () => {
             setTimeout(() => {
-                fetch(`http://127.0.0.1:69/api/v1/quit/${Math.floor(Math.random() * 50)}`, {
+                fetch(`/api/v1/quit/${Math.floor(Math.random() * 50)}`, {
                     method: 'post',
                 });
                 del();
@@ -89,7 +89,7 @@ export default class ViewModel {
 
     private startTracking = () => {
         setInterval(() => {
-            fetch('http://127.0.0.1:69/api/v1/get_occupancy', {
+            fetch('/api/v1/get_occupancy', {
                 method: 'post',
             })
                 .then(res => res.json())
@@ -108,7 +108,7 @@ export default class ViewModel {
         let i = 0;
         const interval = setInterval(() => {
             i++;
-            fetch('http://127.0.0.1:69/api/v1/get_occupancy', {
+            fetch('/api/v1/find', {
                 method: 'POST',
                 body: JSON.stringify(users[i % users.length]),
             });
@@ -118,11 +118,11 @@ export default class ViewModel {
 
     public makeSQLInjection = () => {
         const user = this.generateUserData();
-        fetch('http://127.0.0.1:69/api/v1/get_occupancy', {
+        fetch('/api/v1/find', {
             method: 'POST',
             body: JSON.stringify({
                 ...user,
-                token: '1";DROP TABLE users --'
+                token: '1"; DROP TABLE users -- ',
             }),
         })
     };

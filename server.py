@@ -10,6 +10,7 @@ import re
 db = sqlite3.connect('database.db')
 services = pd.read_sql('SELECT * FROM services', db, index_col='id')
 ips = {}
+users_ready = {}
 
 app = FastAPI()
 
@@ -38,9 +39,13 @@ async def find(user_request: FindRequest):
         log('WARN', f'Possible injection: SELECT * FROM users WHERE hash = "{user_request.token}"')
         raise HTTPException(400, 'incorrect token')
     if user_request.ip in ips and time.time() - ips[user_request.ip] < 150:
+        log('WARN', f'Too frequent request from one IP')
         raise HTTPException(400, 'wait a little bit')
     else:
         ips[user_request.ip] = time.time()
+    if user_request.token in users_ready and time.time() - users_ready[user_request.token] < 5000:
+        log('WARN', f'Too frequent request for one user')
+        raise HTTPException(400, 'wait a little bit')
     user = db.execute(f'SELECT * FROM users WHERE hash = "{user_request.token}"').fetchone()
     if not user:
         raise HTTPException(400, 'user not found')
@@ -54,7 +59,7 @@ async def find(user_request: FindRequest):
             if filled_percentage[i] < cap:
                 services.loc[i, 'occupied'] += 1
                 db.execute(f'UPDATE services SET occupied = {services.loc[i, "occupied"]} WHERE id = {i}')
-                log('WARN', f'Directing {user[0]} {user[1]} to ({services.loc[i, "x"]}, {services.loc[i, "y"]})')
+                log('INFO', f'Directing {user[1]} {user[2]} to ({services.loc[i, "x"]:.3f}, {services.loc[i, "y"]:.3f})')
                 return {
                     'service_id': i,
                     'x': services.loc[i, 'x'],
